@@ -12,9 +12,12 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import requests
 import urllib.request
 import json
+from ForecastModel import get_weekly_forecast
+
 pd.set_option('display.max_colwidth', 500)
 
 #get water Temperature
@@ -38,50 +41,52 @@ for row in table.find_all('tr'):
             # Get the value from the fourth cell (Aktueller Wert)
             aktueller_wert = cells[3].text
             wasserTemp = float(aktueller_wert.replace('\xa0', ''))
-    
 
-#get air Temperature
+# several forecast metrics are returned for today and the next six days, always at 12:00.
+forecast = get_weekly_forecast().reset_index(drop=True)
+luftTemp = forecast.loc[0, 'apparent_temperature']
+luftTemp_forecast = forecast.loc[1:, 'apparent_temperature']
+air_temp_deviation = [[luftTemp - min(luftTemp_forecast)], [max(luftTemp_forecast) - luftTemp]]
+air_temp_uncertainty = np.std(forecast.loc[1:, 'apparent_temperature'])
 
-with urllib.request.urlopen('https://data.geo.admin.ch/ch.meteoschweiz.messwerte-lufttemperatur-10min/ch.meteoschweiz.messwerte-lufttemperatur-10min_de.json') as url:
-    data = json.load(url)
+print(f"Water temperature is: {wasserTemp:.1f}°C")
+print(f"Air temperature is: {luftTemp:.1f}°C")
 
-for i in data['features']:
-    if i['properties']['station_name'] == 'Zürich / Affoltern':
-        luftTemp = i['properties']['value']
-
-print("Water temperature is: ", wasserTemp, "°C")
-print("Air temperature is: ", luftTemp, "°C")
-
-limmatCon = 2.5*wasserTemp + luftTemp
-  
+limmatCon = 2.5 * wasserTemp + luftTemp
 
 #plot the Limmat Condition
-wT = np.arange(0,30,1)
-lTu = 50-2.5*wT
-lTb = ((20-wT)*50**(1/2.4)/20)**2.4
-plt.plot(wT, lTu,linewidth=2, color='black')
-plt.plot(wT, lTb,linewidth=2, color='black')
-plt.fill_between(wT, lTb, min(lTb), alpha=0.2,color='coral')
-plt.fill_between(wT, lTu, max(lTu), alpha=0.2,color='limegreen')
+wT = np.arange(0, 30, 1)
+lTu = 50 - 2.5 * wT
+lTb = ((20 - wT) * 50 ** (1 / 2.4) / 20) ** 2.4
+plt.plot(wT, lTu, linewidth=2, color='black')
+plt.plot(wT, lTb, linewidth=2, color='black')
+plt.fill_between(wT, lTb, min(lTb), alpha=0.2, color='coral')
+plt.fill_between(wT, lTu, max(lTu), alpha=0.2, color='limegreen')
 #rest
 plt.xlabel('water temperature [°C]')
 plt.ylabel('air temperature [°C]')
-plt.xlim(min(wT),max(wT))
+plt.xlim(min(wT), max(wT))
 plt.ylim(0, max(lTu))
 plt.grid()
 
-if limmatCon>=50:
-    print("It's time to Limmaaaaat!")
-    plt.plot(wasserTemp, luftTemp,'X', markersize=15, color='limegreen')
-    plt.text(10,45,"It's time to Limmaaaaat!")    
-elif limmatCon<50 and luftTemp>=((20-wasserTemp)*50**(1/2.4)/20)**2.4:
-    print("It's not going to be fun, but you can do it!")
-    plt.plot(wasserTemp, luftTemp,'X', markersize=15, color='black')
-    plt.text(10,45,"It's not going to be fun, but you can do it!")   
+if limmatCon >= 50:
+    color = 'limegreen'
+    message = "It's time to Limmaaaaat!"
+    cmap = cm.get_cmap('Greens')
+elif limmatCon < 50 and luftTemp >= ((20 - wasserTemp) * 50 ** (1 / 2.4) / 20) ** 2.4:
+    message = "It's not going to be fun, but you can do it!"
+    color = 'black'
+    cmap = cm.get_cmap('Greys')
 else:
-    print("Why going to Limmat when it's ski time?!?!")
-    plt.plot(wasserTemp, luftTemp,'X', markersize=15, color='coral')
-    plt.text(10,45,"Why going to Limmat when it's ski time?!?!")  
-    
+    message = "Why going to Limmat when it's ski time?!?!"
+    color = 'coral'
+    cmap = cm.get_cmap('Reds')
+
+print(message)
+plt.errorbar(wasserTemp, luftTemp, yerr=air_temp_deviation, color=cmap(0.4), alpha=0.8, capsize=5,
+             fmt='', markersize=8, ecolor=cmap(0.6), label="Forecast for next week")
+plt.plot(wasserTemp, luftTemp, 'X', markersize=15, color=color)
+plt.text(10, 45, message)
+
 plt.show()
 # %%
