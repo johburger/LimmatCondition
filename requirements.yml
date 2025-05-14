@@ -1,0 +1,17 @@
+name: limmat-env
+channels:
+  - conda-forge
+  - gurobi
+dependencies:
+  - pip
+  - ipython
+  - requests
+  - beautifulsoup4
+  - pandas
+  - numpy
+  - matplotlib
+  - pip:
+      - openmeteo_requests
+      - requests_cache
+      - retry_requests
+     

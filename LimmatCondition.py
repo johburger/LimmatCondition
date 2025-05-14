@@ -12,9 +12,7 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import requests
-import urllib.request
 import json
 from ForecastModel import get_weekly_forecast
 
@@ -22,10 +20,7 @@ pd.set_option('display.max_colwidth', 500)
 
 #get water Temperature
 
-# Your HTML content (replace this with your actual HTML content)
 html_content = requests.get("https://hydroproweb.zh.ch/Listen/AktuelleWerte/AktWassertemp.html")
-# ... (your HTML content here)
-# Parse the HTML content
 soup = bs(html_content.content, features='html.parser')
 # Find the table with the data
 table = soup.find('table')
@@ -72,15 +67,15 @@ plt.grid()
 if limmatCon >= 50:
     color = 'limegreen'
     message = "It's time to Limmaaaaat!"
-    cmap = cm.get_cmap('Greens')
+    cmap = plt.get_cmap('Greens')
 elif limmatCon < 50 and luftTemp >= ((20 - wasserTemp) * 50 ** (1 / 2.4) / 20) ** 2.4:
     message = "It's not going to be fun, but you can do it!"
     color = 'black'
-    cmap = cm.get_cmap('Greys')
+    cmap = plt.get_cmap('Greys')
 else:
     message = "Why going to Limmat when it's ski time?!?!"
     color = 'coral'
-    cmap = cm.get_cmap('Reds')
+    cmap = plt.get_cmap('Reds')
 
 print(message)
 plt.errorbar(wasserTemp, luftTemp, yerr=air_temp_deviation, color=cmap(0.4), alpha=0.8, capsize=5,
