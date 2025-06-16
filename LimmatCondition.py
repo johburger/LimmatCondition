@@ -41,7 +41,7 @@ for row in table.find_all('tr'):
 forecast = get_weekly_forecast().reset_index(drop=True)
 luftTemp = forecast.loc[0, 'apparent_temperature']
 luftTemp_forecast = forecast.loc[1:, 'apparent_temperature']
-air_temp_deviation = [[luftTemp - min(luftTemp_forecast)], [max(luftTemp_forecast) - luftTemp]]
+air_temp_deviation = [[max(0, luftTemp - min(luftTemp_forecast))], [max(max(luftTemp_forecast) - luftTemp, 0)]]
 air_temp_uncertainty = np.std(forecast.loc[1:, 'apparent_temperature'])
 
 print(f"Water temperature is: {wasserTemp:.1f}°C")
