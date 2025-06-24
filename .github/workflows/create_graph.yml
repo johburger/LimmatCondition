@@ -65,4 +65,4 @@ jobs:
       - name: Run Limmat Condition
         shell: bash -l {0}
         run: |
-          python ./.github/workflow_wrapper.py
+          python workflow_wrapper.py
