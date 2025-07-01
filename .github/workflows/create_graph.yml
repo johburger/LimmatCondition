@@ -66,3 +66,4 @@ jobs:
         shell: bash -l {0}
         run: |
           python workflow_wrapper.py
+      - uses: actions4git/add-commit-push@v1
