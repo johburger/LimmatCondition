@@ -8,6 +8,14 @@ If it's not working, check the website from which the water and air temperature 
 
 Enjoy!
 
-To run the script, you need the following packages (just copy the line into your terminal)
+To run the script, you need to install the required packages in a python environment. When located in the root directory of the repository, you can run the following command:
 
-pip install beautifulsoup4 pandas numpy matplotlib requests openmeteo-requests retry-requests requests-cache
+```bash
+conda env create -f requirements.yml
+```
+
+Then, you can run the script with:
+
+```bash
+python LimmatCondition.py
+```
