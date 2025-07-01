@@ -54,6 +54,7 @@ def check_limmat_condition(fig_path=None):
     wT = np.arange(0, 30, 1)
     lTu = 50 - 2.5 * wT
     lTb = ((20 - wT) * 50 ** (1 / 2.4) / 20) ** 2.4
+    plt.figure(figsize=(7.5, 5))
     plt.plot(wT, lTu, linewidth=2, color='black')
     plt.plot(wT, lTb, linewidth=2, color='black')
     plt.fill_between(wT, lTb, min(lTb), alpha=0.2, color='coral')
@@ -79,10 +80,11 @@ def check_limmat_condition(fig_path=None):
         cmap = plt.get_cmap('Reds')
 
     print(message)
+    plt.plot(wasserTemp, luftTemp, 'X', markersize=15, color=color, label="Today's conditions")
     plt.errorbar(wasserTemp, luftTemp, yerr=air_temp_deviation, color=cmap(0.4), alpha=0.8, capsize=5,
                  fmt='', markersize=8, ecolor=cmap(0.6), label="Forecast for next week")
-    plt.plot(wasserTemp, luftTemp, 'X', markersize=15, color=color)
     plt.text(10, 45, message)
+    plt.legend(loc='lower left')
     if fig_path:
         plt.savefig(fig_path)
     else:
