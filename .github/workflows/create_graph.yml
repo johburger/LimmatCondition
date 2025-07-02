@@ -2,7 +2,7 @@ name: Create Limmat Graph
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5'  # This will run the workflow weekdays at midday Zurich time (UTC+2)
+    - cron: '0 9,11,13,15 * * 1-5'  # This will run the workflow weekdays at midday Zurich time (UTC+2)
 
 # Env variables
 env:
@@ -67,4 +67,5 @@ jobs:
         run: |
           python workflow_wrapper.py
       - uses: actions4git/add-commit-push@v1
-      - run: git commit --message 'Daily graph update'
+        with: 
+          commit-message: "Daily graph update"
