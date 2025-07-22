@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import requests
 import json
 from ForecastModel import get_weekly_forecast
-from datetime import datetime
+import datetime as dt
 
 
 def check_limmat_condition(fig_path=None):
@@ -85,7 +85,11 @@ def check_limmat_condition(fig_path=None):
     plt.errorbar(wasserTemp, luftTemp, yerr=air_temp_deviation, color=cmap(0.4), alpha=0.8, capsize=5,
                  fmt='', markersize=8, ecolor=cmap(0.6), label="Forecast for next week")
     plt.text(10, 45, message)
-    plt.title(f"Last updated: {datetime.now().strftime("%d.%m.%y, %H:%M")}")
+    # add timestamp with UTC offset
+    utc_offset = dt.timedelta(seconds=7200)
+    time_now = dt.datetime.now()
+    time_str = time_now + (utc_offset - time_now.astimezone().utcoffset())
+    plt.title(f"Last updated: {time_str.strftime("%d.%m.%y, %H:%M")}")
     plt.legend(loc='lower left')
     if fig_path:
         plt.savefig(fig_path)
